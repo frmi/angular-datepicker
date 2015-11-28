@@ -127,9 +127,13 @@ Module.directive('dateTime', ['$compile', '$document', '$filter', 'dateTimeConfi
       if (angular.isDefined(attrs.open)) {
         scope.$watch(attrs.open, function (newVal, oldVal) {
           if (newVal !== oldVal) {
-            newVal ? element.triggerHandler('focus') : element.triggerHandler('blur');
+            if (newVal) {
+              element.triggerHandler('focus');
+            } else {
+              element.triggerHandler('blur');
+            }
           }
-        })
+        });
       }
 
       function getTemplate() {
