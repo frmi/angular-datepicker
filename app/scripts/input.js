@@ -124,6 +124,14 @@ Module.directive('dateTime', ['$compile', '$document', '$filter', 'dateTimeConfi
         dateChange = datePickerUtils.findFunction(scope, attrs.dateChange);
       }
 
+      if (angular.isDefined(attrs.open)) {
+        scope.$watch(attrs.open, function (newVal, oldVal) {
+          if (newVal !== oldVal) {
+            newVal ? element.triggerHandler('focus') : element.triggerHandler('blur');
+          }
+        })
+      }
+
       function getTemplate() {
         template = dateTimeConfig.template(attrs);
       }
@@ -158,7 +166,7 @@ Module.directive('dateTime', ['$compile', '$document', '$filter', 'dateTimeConfi
           if (eventIsForPicker(pickerIDs, pickerID)) {
             if (picker) {
               //Need to handle situation where the data changed but the picker is currently open.
-              //To handle this, we can create the inner picker with a random ID, then forward 
+              //To handle this, we can create the inner picker with a random ID, then forward
               //any events received to it.
             } else {
               var validateRequired = false;
@@ -198,7 +206,11 @@ Module.directive('dateTime', ['$compile', '$document', '$filter', 'dateTimeConfi
         }
         // create picker element
         picker = $compile(template)(scope);
-        scope.$digest();
+
+        // ensure digest not already in process
+        if (!scope.$$phase) {
+          scope.$digest();
+        }
 
         //If the picker has already been shown before then we shouldn't be binding to events, as these events are already bound to in this scope.
         if (!shownOnce) {
